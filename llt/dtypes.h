@@ -17,6 +17,7 @@
 */
 
 
+/*
 #if defined(__gnu_linux__)
 #  define LINUX
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -28,6 +29,8 @@
 #else
 #  error "unknown platform"
 #endif
+*/
+#define LINUX
 
 #if defined(OPENBSD)
 #if defined(__x86_64__)

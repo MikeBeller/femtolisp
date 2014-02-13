@@ -1,57 +1,36 @@
-CC = gcc
+CC = emcc
+#CC = clang
 
 NAME = flisp
 SRCS = $(NAME).c builtins.c string.c equalhash.c table.c iostream.c
 OBJS = $(SRCS:%.c=%.o)
-DOBJS = $(SRCS:%.c=%.do)
-EXENAME = $(NAME)
-LIBTARGET = lib$(NAME)
+#EXENAME = $(NAME)
+EXENAME = $(NAME).js
 LLTDIR = llt
-LLT = $(LLTDIR)/libllt.a
+LLT = $(LLTDIR)/libllt.so
 
-FLAGS = -falign-functions -Wall -Wno-strict-aliasing -I$(LLTDIR) $(CFLAGS) -DUSE_COMPUTED_GOTO
+FLAGS = -Wall -Wno-strict-aliasing -I$(LLTDIR) $(CFLAGS) -DUSE_COMPUTED_GOTO
 LIBFILES = $(LLT)
-LIBS = $(LIBFILES) -lm
+LIBS = $(LIBFILES)
+#LIBS = $(LIBFILES) -lm
 
-DEBUGFLAGS = -g -DDEBUG $(FLAGS)
-SHIPFLAGS = -O2 -DNDEBUG $(FLAGS)
+CCFLAGS = -g -DDEBUG $(FLAGS)
 
-default: release test
-
-test:
-	cd tests && ../flisp unittest.lsp
+default: release
 
 %.o: %.c
-	$(CC) $(SHIPFLAGS) -c $< -o $@
-%.do: %.c
-	$(CC) $(DEBUGFLAGS) -c $< -o $@
+	$(CC) $(CCFLAGS) -c $< -o $@
 
 flisp.o:  flisp.c cvalues.c operators.c types.c flisp.h print.c read.c equal.c
-flisp.do: flisp.c cvalues.c operators.c types.c flisp.h print.c read.c equal.c
 flmain.o: flmain.c flisp.h
-flmain.do: flmain.c flisp.h
 
 $(LLT):
 	cd $(LLTDIR) && make
 
-$(LIBTARGET).da: $(DOBJS)
-	rm -rf $@
-	ar rs $@ $(DOBJS)
-
-$(LIBTARGET).a: $(OBJS)
-	rm -rf $@
-	ar rs $@ $(OBJS)
-
-debug: $(DOBJS) $(LIBFILES) $(LIBTARGET).da flmain.do
-	$(CC) $(DEBUGFLAGS) $(DOBJS) flmain.do -o $(EXENAME) $(LIBS) $(LIBTARGET).da
-	make test
-
-release: $(OBJS) $(LIBFILES) $(LIBTARGET).a flmain.o
-	$(CC) $(SHIPFLAGS) $(OBJS) flmain.o -o $(EXENAME) $(LIBS) $(LIBTARGET).a
+release: $(OBJS) $(LIBFILES) flmain.o
+	$(CC) $(CCFLAGS) $(OBJS) flmain.o -o $(EXENAME) $(LIBS) --embed-file flisp.boot
 
 clean:
 	rm -f *.o
 	rm -f *.do
 	rm -f $(EXENAME)
-	rm -f $(LIBTARGET).a
-	rm -f $(LIBTARGET).da
