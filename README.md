@@ -1,3 +1,7 @@
+## NOTES TO EMSCRIPTEN BRANCH
+
+This is a branch to try to get femtolisp compiling in emscripten -- Mike
+
 ## ...a purely symbolic gesture...
 
 This project began with an attempt to write the fastest lisp interpreter I could in under 1000 lines of C. It snowballed from there as I kept trying to see if I could add powerful features with minimal code. At the same time I assembled a library of some of my favorite C code (by myself and others) to use as a base for a standard library. This includes `ios`, a replacement for parts of C's stdio that adds more flexible features.
